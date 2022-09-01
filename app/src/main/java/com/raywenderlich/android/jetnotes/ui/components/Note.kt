@@ -11,8 +11,12 @@ import androidx.compose.ui.unit.dp
 import com.raywenderlich.android.jetnotes.theme.rwGreen
 
 @Composable
-fun Note() {
-    Row(modifier = Modifier.fillMaxWidth()) {
+fun Note(paddingValues: PaddingValues) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues)
+    ) {
         Box(
             modifier = Modifier
                 .size(40.dp)
@@ -30,5 +34,5 @@ fun Note() {
 @Preview(showBackground = true)
 @Composable
 private fun NotePreview() {
-    Note()
+    Note(PaddingValues())
 }

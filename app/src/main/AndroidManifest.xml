@@ -13,11 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JetNotes"
         tools:targetApi="31">
-        <!-- Splash Activity -->
         <activity
-            android:name=".SplashActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" />
+<!--        <activity android:name=".SplashActivity" />-->
     </application>
 
 </manifest>

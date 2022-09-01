@@ -3,11 +3,9 @@ package com.raywenderlich.android.jetnotes.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
@@ -17,6 +15,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.raywenderlich.android.jetnotes.routing.JetNotesRouter
+import com.raywenderlich.android.jetnotes.routing.Screen
 import com.raywenderlich.android.jetnotes.theme.JetNotesTheme
 import com.raywenderlich.android.jetnotes.theme.JetNotesThemeSettings
 
@@ -36,6 +36,9 @@ fun AppDrawerHeader() {
     }
 }
 
+/**
+ * Drawer navigation button
+ */
 @Composable
 private fun ScreenNavigationButton(
     icon: ImageVector,
@@ -86,6 +89,9 @@ private fun ScreenNavigationButton(
     }
 }
 
+/**
+ * Theme switcher
+ */
 @Composable
 private fun LightDarkThemeItem() {
     Row(modifier = Modifier.padding(8.dp)) {
@@ -108,6 +114,40 @@ private fun LightDarkThemeItem() {
     }
 }
 
+/**
+ Drawer Screen
+ */
+@Composable
+fun AppDrawer(currentScreen: Screen, closeDrawerAction: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        AppDrawerHeader()
+
+        Divider(color = MaterialTheme.colors.onSurface.copy(alpha = .2f))
+
+        ScreenNavigationButton(
+            icon = Icons.Filled.Home,
+            label = "Notes",
+            isSelected = currentScreen == Screen.Notes,
+            onClick = {
+                JetNotesRouter.navigateTo(Screen.Notes)
+                closeDrawerAction()
+            }
+        )
+
+        ScreenNavigationButton(
+            icon = Icons.Filled.Delete,
+            label = "Trash",
+            isSelected = currentScreen == Screen.Trash,
+            onClick = {
+                JetNotesRouter.navigateTo(Screen.Trash)
+                closeDrawerAction()
+            }
+        )
+
+        LightDarkThemeItem()
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AppDrawerHeaderPreview() {
@@ -119,12 +159,14 @@ fun AppDrawerHeaderPreview() {
 @Preview(showBackground = true)
 @Composable
 fun ScreenNavigationButtonPreView() {
-    ScreenNavigationButton(
-        icon = Icons.Filled.Home,
-        label = "Notes",
-        isSelected = true,
-        onClick = {}
-    )
+    JetNotesTheme {
+        ScreenNavigationButton(
+            icon = Icons.Filled.Home,
+            label = "Notes",
+            isSelected = true,
+            onClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -132,5 +174,13 @@ fun ScreenNavigationButtonPreView() {
 fun LightDarkThemeItemPreview() {
     JetNotesTheme {
         LightDarkThemeItem()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppDrawerPreview() {
+    JetNotesTheme {
+        AppDrawer(currentScreen = Screen.Notes) {}
     }
 }
