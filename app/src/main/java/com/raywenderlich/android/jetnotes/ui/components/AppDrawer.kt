@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.raywenderlich.android.jetnotes.theme.JetNotesTheme
+import com.raywenderlich.android.jetnotes.theme.JetNotesThemeSettings
 
 @Composable
 fun AppDrawerHeader() {
@@ -84,6 +86,27 @@ private fun ScreenNavigationButton(
     }
 }
 
+@Composable
+private fun LightDarkThemeItem() {
+    Row(modifier = Modifier.padding(8.dp)) {
+        Text(
+            text = "Turn on dark theme",
+            style = MaterialTheme.typography.body2,
+            color = MaterialTheme.colors.onSurface.copy(0.6f),
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
+                .align(alignment = Alignment.CenterVertically)
+        )
+        Switch(
+            checked = JetNotesThemeSettings.isDarkThemeEnabled,
+            onCheckedChange = { JetNotesThemeSettings.isDarkThemeEnabled = it },
+            modifier = Modifier
+                .padding(start = 8.dp, end = 8.dp)
+                .align(alignment = Alignment.CenterVertically)
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -95,11 +118,19 @@ fun AppDrawerHeaderPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun ScreenNavigationButtonView() {
+fun ScreenNavigationButtonPreView() {
     ScreenNavigationButton(
         icon = Icons.Filled.Home,
         label = "Notes",
         isSelected = true,
         onClick = {}
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LightDarkThemeItemPreview() {
+    JetNotesTheme {
+        LightDarkThemeItem()
+    }
 }
