@@ -1,6 +1,5 @@
 package com.raywenderlich.android.jetnotes.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
@@ -17,11 +16,7 @@ fun Note(paddingValues: PaddingValues) {
             .fillMaxWidth()
             .padding(paddingValues)
     ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .background(rwGreen)
-        )
+        NoteColor(color = rwGreen, padding = 4.dp, size = 40.dp, border = 1.dp)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = "Title", maxLines = 1)
             Text(text = "Content", maxLines = 1)
