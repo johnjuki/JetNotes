@@ -37,16 +37,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.rememberCoroutineScope
-import com.raywenderlich.android.jetnotes.routing.Screen
 import com.raywenderlich.android.jetnotes.theme.JetNotesTheme
-import com.raywenderlich.android.jetnotes.ui.components.AppDrawer
-import com.raywenderlich.android.jetnotes.ui.components.Note
+import com.raywenderlich.android.jetnotes.ui.screens.NotesScreen
 import com.raywenderlich.android.jetnotes.viewmodel.MainViewModel
 import com.raywenderlich.android.jetnotes.viewmodel.MainViewModelFactory
-import kotlinx.coroutines.launch
 
 /**
  * Main activity for the app.
@@ -65,25 +59,27 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             JetNotesTheme {
-                val coroutineScope = rememberCoroutineScope()
-                val scaffoldState = rememberScaffoldState()
+//                val coroutineScope = rememberCoroutineScope()
+//                val scaffoldState = rememberScaffoldState()
+//
+//                Scaffold(
+//                    scaffoldState = scaffoldState,
+//                    drawerContent = {
+//                        AppDrawer(
+//                            currentScreen = Screen.Notes,
+//                            closeDrawerAction = {
+//                                coroutineScope.launch {
+//                                    scaffoldState.drawerState.close()
+//                                }
+//                            }
+//                        )
+//                    },
+//                    content = { paddingValues ->
+//                        Note(paddingValues)
+//                    }
+//                )
 
-                Scaffold(
-                    scaffoldState = scaffoldState,
-                    drawerContent = {
-                        AppDrawer(
-                            currentScreen = Screen.Notes,
-                            closeDrawerAction = {
-                                coroutineScope.launch {
-                                    scaffoldState.drawerState.close()
-                                }
-                            }
-                        )
-                    },
-                    content = { paddingValues ->
-                        Note(paddingValues)
-                    }
-                )
+                NotesScreen(viewModel = viewModel)
             }
         }
     }

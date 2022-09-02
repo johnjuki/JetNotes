@@ -43,6 +43,7 @@ import com.raywenderlich.android.jetnotes.data.database.model.ColorDbModel
 import com.raywenderlich.android.jetnotes.data.database.model.NoteDbModel
 import com.raywenderlich.android.jetnotes.domain.model.ColorModel
 import com.raywenderlich.android.jetnotes.domain.model.NoteModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -70,6 +71,7 @@ class RepositoryImpl(
   /**
    * Populates database with colors if it is empty.
    */
+  @OptIn(DelicateCoroutinesApi::class)
   private fun initDatabase(postInitAction: () -> Unit) {
     GlobalScope.launch {
       // Prepopulate colors
