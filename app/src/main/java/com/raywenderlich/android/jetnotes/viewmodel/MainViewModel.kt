@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
  * This view model is used for all screens.
  */
 class MainViewModel(private val repository: Repository) : ViewModel() {
-    val noteNotInTrash : LiveData<List<NoteModel>> by lazy {
+    val notesNotInTrash : LiveData<List<NoteModel>> by lazy {
         repository.getAllNotesNotInTrash()
     }
 
