@@ -28,7 +28,7 @@ import com.raywenderlich.android.jetnotes.theme.JetNotesTheme
 fun TopAppBar(
     title: String,
     icon: ImageVector,
-    onIconOnClick: () -> Unit
+    onIconClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -41,7 +41,7 @@ fun TopAppBar(
             contentDescription = "Top App Bar Icon",
             colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary),
             modifier = Modifier
-                .clickable { onIconOnClick() }
+                .clickable { onIconClick() }
                 .padding(16.dp)
                 .align(Alignment.CenterVertically)
         )
