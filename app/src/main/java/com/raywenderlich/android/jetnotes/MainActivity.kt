@@ -37,8 +37,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import com.raywenderlich.android.jetnotes.routing.JetNotesRouter
+import com.raywenderlich.android.jetnotes.routing.Screen
 import com.raywenderlich.android.jetnotes.theme.JetNotesTheme
 import com.raywenderlich.android.jetnotes.ui.screens.NotesScreen
+import com.raywenderlich.android.jetnotes.ui.screens.SaveNoteScreen
+import com.raywenderlich.android.jetnotes.ui.screens.TrashScreen
 import com.raywenderlich.android.jetnotes.viewmodel.MainViewModel
 import com.raywenderlich.android.jetnotes.viewmodel.MainViewModelFactory
 
@@ -59,28 +65,19 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             JetNotesTheme {
-//                val coroutineScope = rememberCoroutineScope()
-//                val scaffoldState = rememberScaffoldState()
-//
-//                Scaffold(
-//                    scaffoldState = scaffoldState,
-//                    drawerContent = {
-//                        AppDrawer(
-//                            currentScreen = Screen.Notes,
-//                            closeDrawerAction = {
-//                                coroutineScope.launch {
-//                                    scaffoldState.drawerState.close()
-//                                }
-//                            }
-//                        )
-//                    },
-//                    content = { paddingValues ->
-//                        Note(paddingValues)
-//                    }
-//                )
-
-                NotesScreen(viewModel = viewModel)
+                MainActivityScreen(viewModel = viewModel)
             }
+        }
+    }
+}
+
+@Composable
+private fun MainActivityScreen(viewModel: MainViewModel) {
+    Surface {
+        when (JetNotesRouter.currentScreen) {
+            is Screen.Notes -> NotesScreen(viewModel = viewModel)
+            is Screen.SaveNote -> SaveNoteScreen(viewModel = viewModel)
+            is Screen.Trash -> TrashScreen(viewModel = viewModel)
         }
     }
 }

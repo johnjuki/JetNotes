@@ -34,10 +34,13 @@
 package com.raywenderlich.android.jetnotes.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raywenderlich.android.jetnotes.data.repository.Repository
 import com.raywenderlich.android.jetnotes.domain.model.NoteModel
+import com.raywenderlich.android.jetnotes.routing.JetNotesRouter
+import com.raywenderlich.android.jetnotes.routing.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -51,12 +54,19 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         repository.getAllNotesNotInTrash()
     }
 
+    private var _noteEntry = MutableLiveData<NoteModel>()
+    val noteEntry : LiveData<NoteModel> = _noteEntry
+
     fun onCreateNewNoteClick() {
-        // TODO - Open SaveNoteScreen
+        // Open SaveNoteScreen in create mode
+        _noteEntry.value = NoteModel()
+        JetNotesRouter.navigateTo(Screen.SaveNote)
     }
 
     fun onNoteClick(note: NoteModel) {
-        // TODO - Open SaveNoteScreen in edit mode
+        // Open SaveNoteScreen in edit mode
+        _noteEntry.value = note
+        JetNotesRouter.navigateTo(Screen.SaveNote)
     }
 
     fun onNoteCheckedChange(note: NoteModel) {
