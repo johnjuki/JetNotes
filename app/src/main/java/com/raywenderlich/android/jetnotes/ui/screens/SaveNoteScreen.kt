@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.raywenderlich.android.jetnotes.R
@@ -110,6 +111,67 @@ private fun SaveNoteTopBar(
 }
 
 @Composable
+private fun ContentTextField(
+    modifier: Modifier = Modifier,
+    label: String,
+    text: String,
+    onTextChange: (String) -> Unit
+) {
+    TextField(
+        value = text,
+        onValueChange = onTextChange,
+        label = { Text(text = label) },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.surface)
+    )
+}
+
+@Composable
+private fun PickedColor(color: ColorModel) {
+    Row(
+        Modifier
+            .padding(8.dp)
+            .padding(top = 16.dp)
+    ) {
+        Text(
+            text = "Picked color",
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+        )
+        NoteColor(
+            color = Color.fromHex(color.hex),
+            size = 40.dp,
+            border = 1.dp,
+            modifier = Modifier.padding(4.dp)
+        )
+    }
+}
+
+@Composable
+private fun NoteCheckOption(isChecked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
+    Row(
+        Modifier
+            .padding(8.dp)
+            .padding(top = 16.dp)
+    ) {
+        Text(
+            text = "Can note be checked off?",
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+        )
+        Switch(
+            checked = isChecked,
+            onCheckedChange = onCheckedChanged,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+@Composable
 private fun ColorPicker(
     colors: List<ColorModel>,
     onColorSelect: (ColorModel) -> Unit
@@ -198,3 +260,21 @@ fun ColorItem(
 //        onColorSelect = {}
 //    )
 //}
+
+@Preview(showBackground = true)
+@Composable
+fun ContentTextFieldPreview() {
+    ContentTextField(label = "Title", text = "", onTextChange = {})
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NoteCheckOptionPreview() {
+    NoteCheckOption(isChecked = false, onCheckedChanged = {})
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PickerColorPreview() {
+    PickedColor(ColorModel.DEFAULT)
+}
