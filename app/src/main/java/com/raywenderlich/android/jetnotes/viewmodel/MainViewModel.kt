@@ -38,16 +38,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raywenderlich.android.jetnotes.data.repository.Repository
+import com.raywenderlich.android.jetnotes.domain.model.ColorModel
 import com.raywenderlich.android.jetnotes.domain.model.NoteModel
 import com.raywenderlich.android.jetnotes.routing.JetNotesRouter
 import com.raywenderlich.android.jetnotes.routing.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * View model used for storing the global app state.
  *
  * This view model is used for all screens.
+ *
  */
 class MainViewModel(private val repository: Repository) : ViewModel() {
     val notesNotInTrash : LiveData<List<NoteModel>> by lazy {
@@ -57,16 +60,49 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     private var _noteEntry = MutableLiveData<NoteModel>()
     val noteEntry : LiveData<NoteModel> = _noteEntry
 
+    // Expose colors to be used in SaveNoteScreen
+    val colors: LiveData<List<ColorModel>> by lazy {
+        repository.getAllColors()
+    }
+
+    // Open SaveNoteScreen in create mode (from NotesScreen)
     fun onCreateNewNoteClick() {
-        // Open SaveNoteScreen in create mode
         _noteEntry.value = NoteModel()
         JetNotesRouter.navigateTo(Screen.SaveNote)
     }
 
+    // Open SaveNoteScreen in edit mode (from NotesScreen)
     fun onNoteClick(note: NoteModel) {
-        // Open SaveNoteScreen in edit mode
         _noteEntry.value = note
         JetNotesRouter.navigateTo(Screen.SaveNote)
+    }
+
+    // Change the noteEntry state when user interacts with the Save Note Screen
+
+    fun onNoteEntryChange(note: NoteModel) {
+        _noteEntry.value = note
+    }
+
+    fun saveNote(note: NoteModel) {
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.insertNote(note)
+
+            withContext(Dispatchers.Main) {
+                JetNotesRouter.navigateTo(Screen.Notes)
+
+                _noteEntry.value = NoteModel()
+            }
+        }
+    }
+
+    fun moveNoteToTrash(note: NoteModel) {
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.moveNoteToTrash(note.id)
+
+            withContext(Dispatchers.Main) {
+                JetNotesRouter.navigateTo(Screen.Notes)
+            }
+        }
     }
 
     fun onNoteCheckedChange(note: NoteModel) {

@@ -1,25 +1,22 @@
 package com.raywenderlich.android.jetnotes.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.raywenderlich.android.jetnotes.R
@@ -31,27 +28,109 @@ import com.raywenderlich.android.jetnotes.routing.Screen
 import com.raywenderlich.android.jetnotes.ui.components.NoteColor
 import com.raywenderlich.android.jetnotes.util.fromHex
 import com.raywenderlich.android.jetnotes.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SaveNoteScreen(viewModel: MainViewModel) {
 
+    // Subscribe SaveNoteScreen() to viewModel.noteEntry’s state
     val noteEntry: NoteModel by viewModel
         .noteEntry
         .observeAsState(NoteModel())
+
+    // Subscribe SaveNoteScreen() to viewModel.colors’s state
+    val colors: List<ColorModel> by viewModel
+        .colors
+        .observeAsState(listOf())
+
+    val bottomDrawerState: BottomDrawerState =
+        rememberBottomDrawerState(initialValue = BottomDrawerValue.Closed)
+
+    val coroutineScope = rememberCoroutineScope()
+
+    /**
+     * This state represents whether the confirm move note to trash dialog is visible
+     */
+    val moveNoteToTrashDialogShownState: MutableState<Boolean> =
+        rememberSaveable { // TODO: Change to remember() & see the difference
+            mutableStateOf(false)
+        }
+    
+    BackHandler {
+        if (bottomDrawerState.isOpen) {
+            coroutineScope.launch { bottomDrawerState.close() }
+        } else {
+            JetNotesRouter.navigateTo(Screen.Notes)
+        }
+    }
 
     Scaffold(
         topBar = {
             val isEditingMode: Boolean = noteEntry.id != NEW_NOTE_ID
             SaveNoteTopBar(
                 isEditingMode = isEditingMode,
-                onBackClick = { JetNotesRouter.navigateTo(Screen.Notes) },
-                onSaveNoteClick = { /*TODO*/ },
-                onOpenColorPickerClick = { /*TODO*/ },
-                onDeleteNoteClick = { /*TODO*/ }
+                onBackClick = {
+                    JetNotesRouter.navigateTo(Screen.Notes)
+                },
+                onSaveNoteClick = {
+                    viewModel.saveNote(noteEntry)
+                },
+                onOpenColorPickerClick = {
+                    coroutineScope.launch { bottomDrawerState.open() }
+                },
+                onDeleteNoteClick = {
+                    moveNoteToTrashDialogShownState.value = true
+                }
             )
         },
         content = { paddingValues ->
-            var paddingValues = paddingValues
+            paddingValues
+
+            BottomDrawer(
+                drawerState = bottomDrawerState,
+                drawerContent = {
+                    ColorPicker(
+                        colors = colors,
+                        onColorSelect = { color ->
+                            val newNoteEntry = noteEntry.copy(color = color)
+                            viewModel.onNoteEntryChange(newNoteEntry)
+                            coroutineScope.launch { bottomDrawerState.close() }
+                        }
+                    )
+                },
+                content = {
+                    SaveNoteContent(
+                        note = noteEntry,
+                        onNoteChange = { updateNoteEntry ->
+                            viewModel.onNoteEntryChange(updateNoteEntry)
+                        }
+                    )
+                }
+            )
+
+            if (moveNoteToTrashDialogShownState.value) {
+                AlertDialog(
+                    onDismissRequest = { moveNoteToTrashDialogShownState.value = false },
+                    title = { Text(text = "Move not to trash?") },
+                    text = {
+                        Text(
+                            text = "Are you sure you want to" +
+                                    "move this note to trash?"
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { viewModel.moveNoteToTrash(noteEntry) }) {
+                            Text(text = "Confirm")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { moveNoteToTrashDialogShownState.value = false }) {
+                            Text(text = "Dismiss")
+                        }
+                    }
+                )
+            }
         }
     )
 }
@@ -108,6 +187,47 @@ private fun SaveNoteTopBar(
             }
         }
     )
+}
+
+// This composable will represent the entire logic of creating & editing notes
+@Composable
+private fun SaveNoteContent(
+    note: NoteModel,
+    onNoteChange: (NoteModel) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        ContentTextField(
+            label = "Title",
+            text = note.title,
+            onTextChange = { newTitle ->
+                onNoteChange.invoke(note.copy(title = newTitle))
+            }
+        )
+
+        ContentTextField(
+            modifier = Modifier
+                .heightIn(max = 240.dp)
+                .padding(top = 16.dp),
+            label = "Body",
+            text = note.content,
+            onTextChange = { newContent ->
+                onNoteChange.invoke(note.copy(content = newContent))
+            }
+        )
+
+        val canBeCheckedOff: Boolean = note.isCheckedOff != null
+
+        NoteCheckOption(
+            isChecked = canBeCheckedOff,
+            onCheckedChanged = { canBeCheckedOffNewValue ->
+                val isCheckedOff: Boolean? = if (canBeCheckedOffNewValue) false else null
+
+                onNoteChange.invoke(note.copy(isCheckedOff = isCheckedOff))
+            }
+        )
+
+        PickedColor(color = note.color)
+    }
 }
 
 @Composable
@@ -231,7 +351,13 @@ fun ColorItem(
 //        )
 //    }
 //}
-//
+
+//@Preview(showBackground = true)
+//@Composable
+//fun SaveNoteContentPreview() {
+//        SaveNoteContent(note = NoteModel(title = "Title", content = "Content"), onNoteChange = {})
+//}
+
 //@Preview(showBackground = true)
 //@Composable
 //fun SaveNoteTopBarEditingPreview() {
@@ -261,20 +387,20 @@ fun ColorItem(
 //    )
 //}
 
-@Preview(showBackground = true)
-@Composable
-fun ContentTextFieldPreview() {
-    ContentTextField(label = "Title", text = "", onTextChange = {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ContentTextFieldPreview() {
+//    ContentTextField(label = "Title", text = "", onTextChange = {})
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun NoteCheckOptionPreview() {
+//    NoteCheckOption(isChecked = false, onCheckedChanged = {})
+//}
 
-@Preview(showBackground = true)
-@Composable
-fun NoteCheckOptionPreview() {
-    NoteCheckOption(isChecked = false, onCheckedChanged = {})
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PickerColorPreview() {
-    PickedColor(ColorModel.DEFAULT)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PickerColorPreview() {
+//    PickedColor(ColorModel.DEFAULT)
+//}
