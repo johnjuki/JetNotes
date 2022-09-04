@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 /**
  * Home Screen
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NotesScreen(viewModel: MainViewModel) {
 
@@ -79,6 +80,7 @@ fun NotesScreen(viewModel: MainViewModel) {
 }
 
 @Composable
+@ExperimentalMaterialApi
 fun NotesList(
     paddingValues: PaddingValues? = null,
     notes: List<NoteModel>,
@@ -97,6 +99,7 @@ fun NotesList(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview(showBackground = true)
 @Composable
 fun NotesListPreview() {
