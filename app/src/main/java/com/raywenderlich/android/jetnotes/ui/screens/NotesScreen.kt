@@ -16,7 +16,6 @@ import com.raywenderlich.android.jetnotes.routing.Screen
 import com.raywenderlich.android.jetnotes.theme.rwRed
 import com.raywenderlich.android.jetnotes.ui.components.AppDrawer
 import com.raywenderlich.android.jetnotes.ui.components.Note
-import com.raywenderlich.android.jetnotes.ui.components.TopAppBar
 import com.raywenderlich.android.jetnotes.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -37,10 +36,13 @@ fun NotesScreen(viewModel: MainViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = "JetNotes",
-                icon = Icons.Filled.List,
-                onIconClick = {
-                    coroutineScope.launch { scaffoldState.drawerState.open() }
+                title = {
+                    Text(text = "JetNotes", color = MaterialTheme.colors.onPrimary)
+                },
+                navigationIcon = {
+                    IconButton(onClick = { coroutineScope.launch { scaffoldState.drawerState.open() } }) {
+                        Icon(imageVector = Icons.Filled.List, contentDescription = "Drawer button")
+                    }
                 }
             )
         },
