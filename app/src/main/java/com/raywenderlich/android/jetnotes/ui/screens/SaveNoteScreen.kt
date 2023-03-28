@@ -53,7 +53,7 @@ fun SaveNoteScreen(viewModel: MainViewModel) {
      * This state represents whether the confirm move note to trash dialog is visible
      */
     val moveNoteToTrashDialogShownState: MutableState<Boolean> =
-        rememberSaveable { // TODO: Change to remember() & see the difference
+        rememberSaveable {
             mutableStateOf(false)
         }
     
